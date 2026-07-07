@@ -76,7 +76,22 @@
   .nav-links a:hover{color:#fff;}
   .nav-cta{display:flex; gap:12px; align-items:center;}
   .btn-sm{padding:11px 22px; font-size:14px;}
-  .menu-toggle{display:none; background:none; border:none; color:#fff; font-size:24px; cursor:pointer;}
+  .menu-toggle{display:none; background:none; border:none; color:#fff; font-size:24px; cursor:pointer; line-height:1; padding:4px;}
+
+  .mobile-menu{
+    display:none; flex-direction:column;
+    position:fixed; top:76px; left:0; right:0; z-index:99;
+    max-height:calc(100vh - 76px); overflow-y:auto;
+    background:var(--navy-2); border-bottom:1px solid var(--line);
+    padding:12px 24px 28px;
+  }
+  .mobile-menu.open{display:flex;}
+  .mobile-menu a{
+    color:rgba(255,255,255,0.8); font-size:16px; font-weight:500;
+    padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+  .mobile-menu-cta{display:flex; flex-direction:column; gap:12px; margin-top:18px;}
+  .mobile-menu-cta .btn{width:100%;}
 
   /* HERO */
   .hero{
@@ -107,7 +122,7 @@
   /* PHONE MOCK */
   .phone-wrap{display:flex; justify-content:center; position:relative; z-index:2;}
   .phone{
-    width:290px; background:#081418; border-radius:38px; padding:14px;
+    width:100%; max-width:290px; background:#081418; border-radius:38px; padding:14px;
     box-shadow:0 40px 90px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06);
     position:relative;
   }
@@ -311,7 +326,18 @@
       <a href="#waitlist" class="btn btn-ghost btn-sm">Log in</a>
       <a href="#waitlist" class="btn btn-primary btn-sm">Join Waitlist</a>
     </div>
-    <button class="menu-toggle">☰</button>
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobileMenu">☰</button>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#features">Features</a>
+    <a href="#safety">Safety</a>
+    <a href="#travelers">For Travelers</a>
+    <a href="#business">For Business</a>
+    <a href="#culture">Culture</a>
+    <div class="mobile-menu-cta">
+      <a href="#waitlist" class="btn btn-ghost">Log in</a>
+      <a href="#waitlist" class="btn btn-primary">Join Waitlist</a>
+    </div>
   </div>
 </nav>
 
@@ -639,11 +665,31 @@
     document.getElementById('waitlistEmail').value = '';
   });
 
+  var menuToggle = document.getElementById('menuToggle');
+  var mobileMenu = document.getElementById('mobileMenu');
+
+  function closeMobileMenu(){
+    mobileMenu.classList.remove('open');
+    menuToggle.setAttribute('aria-expanded', 'false');
+    menuToggle.textContent = '☰';
+  }
+
+  menuToggle.addEventListener('click', function(){
+    var isOpen = mobileMenu.classList.toggle('open');
+    menuToggle.setAttribute('aria-expanded', String(isOpen));
+    menuToggle.textContent = isOpen ? '✕' : '☰';
+  });
+
+  window.addEventListener('resize', function(){
+    if(window.innerWidth > 900) closeMobileMenu();
+  });
+
   document.querySelectorAll('a[href^="#"]').forEach(function(link){
     link.addEventListener('click', function(e){
       var target = document.querySelector(this.getAttribute('href'));
       if(target){
         e.preventDefault();
+        closeMobileMenu();
         target.scrollIntoView({behavior:'smooth', block:'start'});
       }
     });
